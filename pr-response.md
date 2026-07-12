@@ -22,8 +22,11 @@ To keep the implementation consistent with the rest of the codebase, I followed 
 ---
 
 ### **Comment 3 — Missing test**
-**What I did:**
-**How I verified:**
+**What I did:** I created a new test file, `tests/test_watchlist`.py, and added a test named `test_add_to_watchlist_nonexistent_film_raises()`. This test verifies that attempting to add a film whose `film_id` does not exist in the database raises `FilmNotFoundError` instead of resulting in a database integrity error or creating an invalid watchlist entry.
+
+To keep the testing style consistent with the rest of the project, I modeled the test directly after `test_add_to_collection_nonexistent_film_raises()` in `tests/test_collection.py`. I used the same fixture structure, application context, and assertion pattern, changing only the service function being tested.
+
+**How I verified:** I first ran `pytest tests/test_watchlist.py -v` to confirm that the new test passed independently. I then ran the full test suite using `pytest tests/ -v` to verify that the new test integrated cleanly with the existing tests and did not introduce any regressions.
 
 ---
 
