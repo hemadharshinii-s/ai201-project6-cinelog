@@ -1,8 +1,8 @@
 import pytest
 from app import create_app, db
-from models import User
+from models import User, Film
 from services.watchlist_service import (
-    add_to_watchlist,
+    add_to_watchlist, remove_from_watchlist,
 )
 from services.collection_service import FilmNotFoundError
 
@@ -44,3 +44,23 @@ def test_add_to_watchlist_nonexistent_film_raises(app, sample_user):
                 user_id=sample_user,
                 film_id=fake_film_id,
             )
+        
+def test_remove_from_watchlist_removes_entry(app, sample_user):
+    """
+    Removing a film that exists in the user's watchlist
+    should delete the entry successfully.
+    """
+    with app.app_context():
+        film = Film(title="Inception")
+        db.session.add(film)
+        db.session.commit()
+
+        add_to_watchlist(
+            user_id=sample_user,
+            film_id=film.id,
+        )
+
+        assert remove_from_watchlist(
+            user_id=sample_user,
+            film_id=film.id,
+        ) is True

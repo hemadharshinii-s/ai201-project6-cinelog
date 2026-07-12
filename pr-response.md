@@ -68,13 +68,17 @@ To keep the testing style consistent with the rest of the project, I modeled the
 
 ### **Stretch Features**
 
-#### **remove_from_watchlist()**
+#### **Add `remove_from_watchlist()`**
 
 I implemented a `remove_from_watchlist()` service that allows a user to remove a saved film from their watchlist. The function searches for the watchlist entry using the provided `user_id` and `film_id`. If no matching entry exists, it raises a `NotInWatchlistError`; otherwise, it deletes the entry from the database, commits the transaction, and returns `True`.
 
 To keep the implementation consistent with the rest of the project, I followed the same structure and error-handling pattern used by `remove_from_collection()` in `services/collection_service.py`.
 
 I also wrote a test that creates a watchlist entry, removes it using `remove_from_watchlist()`, and verifies that the operation succeeds. I chose this edge case because removing an existing watchlist item is the primary behavior of the new feature and confirms that entries are deleted correctly.
+
+#### **Second Test**
+
+Beyond the required nonexistent-film test, I added a second test for `remove_from_watchlist()`. This test verifies that an existing watchlist entry can be removed successfully and confirms that the function returns `True` after deleting the entry. I chose this case because it exercises the primary behavior of the new removal feature while following the same testing style used elsewhere in the project.
 
 ---
 
