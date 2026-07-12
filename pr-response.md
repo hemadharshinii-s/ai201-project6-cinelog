@@ -1,7 +1,16 @@
 # **PR Response Doc — CineLog Watchlist Feature**
 
+### **Screenshot of Commit History**
+
+![](gitLog.png)
+
 ### **AI Usage**
 <!-- Fill in at the end — how you used AI tools during this project -->
+I used AI tools throughout this project as a support tool for understanding the codebase and validating my reasoning. For implementation work, I used AI to help compare my changes against existing project patterns, such as understanding how `add_to_collection()` handled duplicate entries before implementing the equivalent watchlist logic.
+
+For Comments 4 and 5, I used AI as a devil's advocate after drafting my responses. I asked what counterarguments a careful reviewer might raise and what tradeoffs I might be missing. Based on that feedback, I strengthened my explanations by explicitly addressing privacy concerns for public watchlists and acknowledging the usefulness of alphabetical sorting while explaining why date-added better fits the typical watchlist workflow.
+
+For the final commit review, I also used AI to check whether my commit messages followed conventional commit formatting and whether each commit represented a single logical change. I verified the suggestions myself against the project's contribution standards.
 
 --- 
 
@@ -49,13 +58,58 @@ To keep the testing style consistent with the rest of the project, I modeled the
 ---
 
 ### **Comment 6 — Rebase**
-**What conflicted:** I fetched the latest `main` branch and rebased my `feature/watchlist` branch onto it. During the rebase, Git reported a merge conflict in `.gitignore` because both branches had added the file independently. After completing the rebase, I also discovered that the updated `main` branch no longer contained the `WatchlistEntry` model, causing an import error when running the tests. This was a consequence of rebasing onto the UUID refactor, which changed the underlying models.
+**What conflicted:** I rebased `feature/watchlist` onto the updated `main` branch after the film ID refactor. The main branch changed film identifiers from integer IDs to UUID strings, which conflicted with watchlist code that still assumed integer-based film IDs.
 
-**How I resolved it:** I resolved the `.gitignore` conflict by keeping the combined ignore entries, staged the file, and continued the rebase with `git rebase --continue`. After the rebase completed, I restored the `WatchlistEntry` model in `models.py` and updated it to use UUID-based film IDs (`db.String(36)`) so it matched the refactored `Film` model and remained compatible with the rest of the application.
+**How I resolved it:** I updated the watchlist implementation to match the UUID-based model structure from `main`. Specifically, I changed the watchlist film references to use UUID-compatible string fields (`db.String(36)`) and updated related lookups to work with the refactored Film model.
 
-**How I verified no conflict remains:** After resolving the conflicts, I ran the full test suite with `pytest tests/ -v` and confirmed that all five tests passed successfully. I also reviewed the commit history using `git log --oneline --decorate` to verify that my branch has a linear history with no feature-branch merge commits.
+**How I verified no conflict remains:** I completed the rebase successfully, ran `pytest tests/ -v` to confirm the updated code worked with the UUID models, and checked `git log --oneline` to verify the branch history was linear with no merge commits.
 
 ---
 
 ### **PR Description**
 <!-- Written at the end — feature overview, design decisions, manual testing steps -->
+#### **Overview**
+
+This PR adds a watchlist feature to CineLog that allows users to save films they want to watch later. Users can add films to their watchlist, retrieve their saved films, and prevent duplicate watchlist entries through validation in the service layer.
+
+#### **Design Decisions**
+
+**Default Visibility: Public**
+
+Watchlists default to `public=True` because CineLog is designed around film discovery and social engagement. Public watchlists allow users to share their interests and help other users discover films. The tradeoff is reduced privacy compared to a private-by-default approach, but public visibility better supports the platform's community goals.
+
+**Sort Order: Date Added (Newest First)**
+
+Watchlists are sorted by date added with the newest additions appearing first. This matches how users typically interact with watchlists: reviewing recently discovered films and deciding what to watch next. Alphabetical sorting may help users find titles in very large lists, but date-added better matches the primary workflow.
+
+#### **Manual Testing Instructions**
+
+1. Activate the virtual environment: `source .venv/bin/activate`
+2. Run the test suite: `pytest tests/ -v`
+
+3. Confirm the watchlist tests pass:
+- Adding a nonexistent film raises `FilmNotFoundError`.
+- Existing collection behavior remains unchanged.
+
+4. Manually test the endpoint:
+- Start the Flask application.
+- Send a POST request to:
+  ```
+  /watchlist/<user_id>/add
+  ```
+- Include:
+  ```json
+  {
+    "film_id": "<film_uuid>"
+  }
+  ```
+- Confirm the film is added successfully.
+- Attempt to add the same film again and confirm duplicate detection prevents another entry.
+
+5. Retrieve the user's watchlist using: `GET /watchlist/<user_id>`\
+Confirm entries are returned newest-first and include visibility metadata.
+
+Expected result:
+- The first POST creates a watchlist entry.
+- The second POST with the same film returns the duplicate-entry error.
+- GET returns the saved films ordered newest-first.
