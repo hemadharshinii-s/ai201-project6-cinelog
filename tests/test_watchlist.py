@@ -64,3 +64,21 @@ def test_remove_from_watchlist_removes_entry(app, sample_user):
             user_id=sample_user,
             film_id=film.id,
         ) is True
+
+def test_add_to_watchlist_private_entry(app, sample_user):
+    """
+    Adding a watchlist entry with public=False
+    should preserve that visibility setting.
+    """
+    with app.app_context():
+        film = Film(title="Arrival")
+        db.session.add(film)
+        db.session.commit()
+
+        entry = add_to_watchlist(
+            user_id=sample_user,
+            film_id=film.id,
+            public=False,
+        )
+
+        assert entry.public is False

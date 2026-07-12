@@ -80,6 +80,14 @@ I also wrote a test that creates a watchlist entry, removes it using `remove_fro
 
 Beyond the required nonexistent-film test, I added a second test for `remove_from_watchlist()`. This test verifies that an existing watchlist entry can be removed successfully and confirms that the function returns `True` after deleting the entry. I chose this case because it exercises the primary behavior of the new removal feature while following the same testing style used elsewhere in the project.
 
+#### **Visibility Toggle Endpoint**
+
+I updated the watchlist endpoint to accept an optional `public` parameter when creating a watchlist entry. If the caller omits the parameter, the value defaults to `True`, preserving the original behavior. If the caller supplies `"public": false`, the created watchlist entry is stored as private.
+
+This change allows callers to choose the visibility of individual watchlist entries without requiring any changes to existing clients, since requests that omit the parameter continue to behave exactly as before.
+
+I also added a test verifying that creating a watchlist entry with `public=False` preserves the requested visibility.
+
 ---
 
 ### **PR Description**
