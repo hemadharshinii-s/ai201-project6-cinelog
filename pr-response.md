@@ -49,9 +49,11 @@ To keep the testing style consistent with the rest of the project, I modeled the
 ---
 
 ### **Comment 6 — Rebase**
-**What conflicted:**
-**How I resolved it:**
-**How I verified no conflict remains:**
+**What conflicted:** I fetched the latest `main` branch and rebased my `feature/watchlist` branch onto it. During the rebase, Git reported a merge conflict in `.gitignore` because both branches had added the file independently. After completing the rebase, I also discovered that the updated `main` branch no longer contained the `WatchlistEntry` model, causing an import error when running the tests. This was a consequence of rebasing onto the UUID refactor, which changed the underlying models.
+
+**How I resolved it:** I resolved the `.gitignore` conflict by keeping the combined ignore entries, staged the file, and continued the rebase with `git rebase --continue`. After the rebase completed, I restored the `WatchlistEntry` model in `models.py` and updated it to use UUID-based film IDs (`db.String(36)`) so it matched the refactored `Film` model and remained compatible with the rest of the application.
+
+**How I verified no conflict remains:** After resolving the conflicts, I ran the full test suite with `pytest tests/ -v` and confirmed that all five tests passed successfully. I also reviewed the commit history using `git log --oneline --decorate` to verify that my branch has a linear history with no feature-branch merge commits.
 
 ---
 
