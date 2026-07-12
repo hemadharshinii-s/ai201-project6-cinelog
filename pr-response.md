@@ -13,8 +13,11 @@
 ---
 
 ### **Comment 2 — Deduplication**
-**What I did:**
-**How I verified:**
+**What I did:** I added a duplicate check to `add_to_watchlist()` so that the service verifies whether the specified film is already on the user's watchlist before creating a new `WatchlistEntry`. If an existing entry is found for the same `user_id` and `film_id`, the function now raises an `AlreadyInWatchlistError` instead of creating a duplicate record. I also documented this behavior in the function's `Raises` section.
+
+To keep the implementation consistent with the rest of the codebase, I followed the same pattern used in `add_to_collection()` within `services/collection_service.py`: validate that the film exists, check for an existing entry, raise a custom exception if a duplicate is detected, and only create and commit a new entry when no duplicate exists.
+
+**How I verified:** I compared my implementation against the existing `add_to_collection()` function to ensure it followed the same validation and deduplication workflow. After making the change, I ran the full test suite using `pytest tests/ -v` to confirm that the modification did not introduce any regressions.
 
 ---
 
