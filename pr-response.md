@@ -22,7 +22,7 @@ To keep the implementation consistent with the rest of the codebase, I followed 
 ---
 
 ### **Comment 3 — Missing test**
-**What I did:** I created a new test file, `tests/test_watchlist`.py, and added a test named `test_add_to_watchlist_nonexistent_film_raises()`. This test verifies that attempting to add a film whose `film_id` does not exist in the database raises `FilmNotFoundError` instead of resulting in a database integrity error or creating an invalid watchlist entry.
+**What I did:** I created a new test file, `tests/test_watchlist.py`, and added a test named `test_add_to_watchlist_nonexistent_film_raises()`. This test verifies that attempting to add a film whose `film_id` does not exist in the database raises `FilmNotFoundError` instead of resulting in a database integrity error or creating an invalid watchlist entry.
 
 To keep the testing style consistent with the rest of the project, I modeled the test directly after `test_add_to_collection_nonexistent_film_raises()` in `tests/test_collection.py`. I used the same fixture structure, application context, and assertion pattern, changing only the service function being tested.
 
@@ -30,17 +30,21 @@ To keep the testing style consistent with the rest of the project, I modeled the
 
 ---
 
-### **Comment 4 — Default visibility**
-**My position:**
-**Reasoning:**
-**Tradeoff acknowledged:**
+### **Comment 4 — Default visibility** 
+**My position:** I support keeping the default value of `public=True` for watchlists.
+
+**Reasoning:** CineLog is a social platform centered around discovering and discussing films. A public watchlist allows users to share upcoming movies they are interested in, helps other users discover new films through recommendations, and makes user profiles more engaging without requiring additional configuration. Most users who choose to create a watchlist are doing so to organize films they plan to watch, and making those lists visible by default encourages discovery and community interaction while still allowing future privacy features to build on that foundation.
+
+**Tradeoff acknowledged:** The primary advantage of a private-by-default watchlist is that it prioritizes user privacy and avoids exposing viewing interests unless a user explicitly chooses to share them. That approach reduces the possibility of unintentionally revealing personal preferences. However, for CineLog's emphasis on film discovery and social engagement, I believe a public default provides greater value for the majority of users. If stronger privacy controls become a priority in the future, allowing users to change the visibility after creating the watchlist would preserve that flexibility without sacrificing discoverability by default.
 
 ---
 
 ### **Comment 5 — Sort order**
-**My position:**
-**Reasoning:**
-**Engagement with reviewer's point:**
+**My position:** I agree with changing the default watchlist order to sort by date added (newest first).
+
+**Reasoning:** A watchlist primarily represents a user's future viewing queue rather than a permanent catalog. In most cases, users interact with the films they have added most recently, whether they are reviewing recent recommendations or deciding what to watch next. Displaying the newest additions first makes those recently saved films immediately visible and reduces the need to search through older entries.
+
+**Engagement with reviewer's point:** I agree with the reviewer's observation that most users expect to see what they added recently. While alphabetical ordering makes it slightly easier to locate a specific title in a very large watchlist, watchlists are generally revisited based on when films were discovered rather than by title. If CineLog later supports user-selectable sorting, alphabetical order could become an optional view, but I believe date-added is the better default because it aligns with the most common workflow for managing a watchlist.
 
 ---
 
